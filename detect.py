@@ -171,7 +171,7 @@ if __name__ == '__main__':
         landms = landms[:args.keep_top_k, :]
 
         dets = np.concatenate((dets, landms), axis=1)
-
+        print(f'net forward and post process time cost {time.time() - tic} s')
         # show image
         if args.save_image:
             for b in dets:
