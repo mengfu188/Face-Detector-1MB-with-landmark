@@ -14,6 +14,7 @@ from models.net_slim import Slim
 from models.net_rfb import RFB
 from utils.box_utils import decode, decode_landm
 from utils.timer import Timer
+import torchvision
 
 
 parser = argparse.ArgumentParser(description='Test')
@@ -123,7 +124,7 @@ if __name__ == '__main__':
 
 
     # testing begin
-    for i in range(100):
+    for i in range(10):
         image_path = "./img/sample.jpg"
 
         img_raw = cv2.imread(image_path, cv2.IMREAD_COLOR)
@@ -164,31 +165,49 @@ if __name__ == '__main__':
         # prior_data = priors.data
         boxes = decode(loc.data.squeeze(0), prior_data, cfg['variance'])
         boxes = boxes * scale / resize
-        boxes = boxes.cpu().numpy()
-        scores = conf.squeeze(0).data.cpu().numpy()[:, 1]
+        if device.type=='cpu':
+            boxes = boxes.cpu().numpy()
+            scores = conf.squeeze(0).data.cpu().numpy()[:, 1]
+        else:
+            scores = conf.squeeze(0).data[:, 1]
         landms = decode_landm(landms.data.squeeze(0), prior_data, cfg['variance'])
         scale1 = torch.Tensor([img.shape[3], img.shape[2], img.shape[3], img.shape[2],
                                img.shape[3], img.shape[2], img.shape[3], img.shape[2],
                                img.shape[3], img.shape[2]])
         scale1 = scale1.to(device)
         landms = landms * scale1 / resize
-        landms = landms.cpu().numpy()
+        if device.type == 'cpu':
+            landms = landms.cpu().numpy()
 
         # ignore low scores
-        inds = np.where(scores > args.confidence_threshold)[0]
+        if device.type=='cpu':
+            inds = np.where(scores > args.confidence_threshold)[0]
+        else:
+            inds = torch.where(scores > args.confidence_threshold)[0]
         boxes = boxes[inds]
         landms = landms[inds]
         scores = scores[inds]
 
         # keep top-K before NMS
-        order = scores.argsort()[::-1][:args.top_k]
+        if device.type=='cpu':
+            order = scores.argsort()[::-1][:args.top_k]
+        else:
+            order = torch.argsort(scores, descending=True)[:args.top_k]
+
         boxes = boxes[order]
         landms = landms[order]
         scores = scores[order]
 
         # do NMS
-        dets = np.hstack((boxes, scores[:, np.newaxis])).astype(np.float32, copy=False)
-        keep = py_cpu_nms(dets, args.nms_threshold)
+        if device.type=='cpu':
+            dets = np.hstack((boxes, scores[:, np.newaxis])).astype(np.float32, copy=False)
+        else:
+            # dets = torch.stack((boxes, scores[:, np.newaxis]), dim).astype(torch.float32, copy=False)
+            dets = torch.cat((boxes, scores[:, np.newaxis]), 1).float()
+        if device.type == 'cpu':
+            keep = py_cpu_nms(dets, args.nms_threshold)
+        else:
+            keep = torchvision.ops.nms(dets[:, 0:4], dets[:,4], args.nms_threshold)
         # keep = nms(dets, args.nms_threshold,force_cpu=args.cpu)
         dets = dets[keep, :]
         landms = landms[keep]
@@ -197,7 +216,11 @@ if __name__ == '__main__':
         dets = dets[:args.keep_top_k, :]
         landms = landms[:args.keep_top_k, :]
 
-        dets = np.concatenate((dets, landms), axis=1)
+        if device.type =='cpu':
+            dets = np.concatenate((dets, landms), axis=1)
+        else:
+            dets = torch.cat((dets, landms), dim=1)
+
         print(f'net forward and post process time cost {time.time() - tic} s')
         # show image
         if args.save_image:
