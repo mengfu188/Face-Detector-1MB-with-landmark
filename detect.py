@@ -95,6 +95,33 @@ if __name__ == '__main__':
     device = torch.device("cpu" if args.cpu else "cuda")
     net = net.to(device)
 
+    image_path = "./img/sample.jpg"
+
+    img_raw = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    img = np.float32(img_raw)
+
+    # testing scale
+    target_size = args.long_side
+    max_size = args.long_side
+    im_shape = img.shape
+    im_size_min = np.min(im_shape[0:2])
+    im_size_max = np.max(im_shape[0:2])
+    resize = float(target_size) / float(im_size_min)
+    # prevent bigger axis from being more than max_size:
+    if np.round(resize * im_size_max) > max_size:
+        resize = float(max_size) / float(im_size_max)
+    if args.origin_size:
+        resize = 1
+
+    if resize != 1:
+        img = cv2.resize(img, None, None, fx=resize, fy=resize, interpolation=cv2.INTER_LINEAR)
+    im_height, im_width, _ = img.shape
+    priorbox = PriorBox(cfg, image_size=(im_height, im_width))
+    priors = priorbox.forward()
+    priors = priors.to(device)
+    prior_data = priors.data
+
+
     # testing begin
     for i in range(100):
         image_path = "./img/sample.jpg"
@@ -131,10 +158,10 @@ if __name__ == '__main__':
         loc, conf, landms = net(img)  # forward pass
         print('net forward time: {:.4f}'.format(time.time() - tic))
 
-        priorbox = PriorBox(cfg, image_size=(im_height, im_width))
-        priors = priorbox.forward()
-        priors = priors.to(device)
-        prior_data = priors.data
+        # priorbox = PriorBox(cfg, image_size=(im_height, im_width))
+        # priors = priorbox.forward()  # 0.15
+        # priors = priors.to(device)
+        # prior_data = priors.data
         boxes = decode(loc.data.squeeze(0), prior_data, cfg['variance'])
         boxes = boxes * scale / resize
         boxes = boxes.cpu().numpy()
@@ -194,5 +221,5 @@ if __name__ == '__main__':
             # save image
 
             name = "test.jpg"
-            cv2.imwrite(name, img_raw)
+            # cv2.imwrite(name, img_raw)
 
