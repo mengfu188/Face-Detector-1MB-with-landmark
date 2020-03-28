@@ -121,7 +121,7 @@ class Detector:
         loc = dets[:, 0:4]
         conf = dets[:, 4]
         landms = dets[:, 5:]
-
+        # landms.reshape(-1, 5, 2) [[x1,y1],[x2,y2],[x3,y3],[x4,y4],[x5,y5]]
         return loc, conf, landms
 
     def preprocess(self, img_raw):
@@ -239,4 +239,4 @@ if __name__ == '__main__':
     image_path = "./img/sample.jpg"
 
     img_raw = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    dets = face_detector.detect(img_raw, True)
+    dets = face_detector.detect(img_raw, False)
