@@ -5,7 +5,8 @@ project(FaceDetector)
 add_definitions(-std=c++11)
 add_definitions("-Wall")
 
-set(OpenCV_DIR "/usr/local/opencv/")
+# set(OpenCV_DIR "/usr/local/opencv/")
+find_package( OpenCV REQUIRED )
 
 if(True)
     find_package(OpenMP)
@@ -16,16 +17,16 @@ if(True)
     endif()
 endif()
 
-include_directories(${OpenCV_DIR}/include
+include_directories(${OpenCV_INCLUDE_DIRS}
                     ${CMAKE_CURRENT_SOURCE_DIR}/ncnn/include/ncnn)
 
-link_directories(${OpenCV_DIR}/lib/
+link_directories(${OpenCV_LIBS}
                  ${CMAKE_CURRENT_SOURCE_DIR}/ncnn/lib)
-set(OpenCV_LIBS opencv_core 
-                opencv_highgui 
-                opencv_imgproc 
-                opencv_imgcodecs 
-                opencv_videoio)
+#set(OpenCV_LIBS opencv_core
+#                opencv_highgui
+#                opencv_imgproc
+#                opencv_imgcodecs
+#                )
 
 set(SRC
         main.cpp
