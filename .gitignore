@@ -1,0 +1,9 @@
+checkpoint/
+.idea/
+widerface_evaluate/widerface_txt
+__pycache__/
+*.so
+*build*/
+CMakeFiles/
+widerface_evaluate/box_overlaps.c
+.idea/
