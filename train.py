@@ -118,7 +118,7 @@ def train():
         if iteration % epoch_size == 0:
             # create batch iterator
             batch_iterator = iter(data.DataLoader(dataset, batch_size, shuffle=True, num_workers=num_workers, collate_fn=detection_collate))
-            if (epoch % 10 == 0 and epoch > 0) or (epoch % 5 == 0 and epoch > cfg['decay1']):
+            if (epoch % 1 == 0 and epoch >= 0) or (epoch % 5 == 0 and epoch > cfg['decay1']):
                 torch.save(net.state_dict(), save_folder + cfg['name']+ '_epoch_' + str(epoch) + '.pth')
             epoch += 1
 
@@ -138,7 +138,7 @@ def train():
         # backprop
         optimizer.zero_grad()
         loss_l, loss_c, loss_landm = criterion(out, priors, targets)
-        loss = cfg['loc_weight'] * loss_l + loss_c + loss_landm
+        loss = cfg['loc_weight'] * loss_l + loss_c + cfg['landm_weight'] * loss_landm
         loss.backward()
         optimizer.step()
         load_t1 = time.time()

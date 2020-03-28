@@ -42,6 +42,7 @@ cfg_rfb = {
     'variance': [0.1, 0.2],
     'clip': False,
     'loc_weight': 2.0,
+    'landm_weight': 1.5,
     'gpu_train': True,
     'batch_size': 32,
     'ngpu': 1,
