@@ -112,7 +112,7 @@ class Detector:
         img = self.preprocess(img_raw)
         tic = time.time()
         loc, conf, landms = self.net(img)  # forward pass
-        print('net forward time: {:.4f}'.format(time.time() - tic))
+        # print('net forward time: {:.4f}'.format(time.time() - tic))
         dets = self.postprocess(img, loc, conf, landms)
         # dets shape is (N, 15)
         # [[xmin, ymin, xmax, ymax, score, x1, y1, x2, y2, x3, y3, x4, y4, x5, y5]]
@@ -202,7 +202,7 @@ class Detector:
         landms = landms[:self.args.keep_top_k, :]
 
         dets = np.concatenate((dets, landms), axis=1)
-        print(f'net forward and post process time cost {time.time() - tic} s')
+        # print(f'net forward and post process time cost {time.time() - tic} s')
 
         return dets
 
