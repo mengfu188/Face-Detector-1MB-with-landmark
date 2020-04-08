@@ -160,7 +160,7 @@ class Detector:
 
     def postprocess(self, img, loc, conf, landms):
         tic = time.time()
-        scale = torch.Tensor([img.shape[1], img.shape[0], img.shape[1], img.shape[0]])
+        scale = torch.Tensor([img.shape[3], img.shape[2], img.shape[3], img.shape[2]])
         scale = scale.to(self.device)
         priorbox = PriorBox(self.cfg, image_size=(self.im_height, self.im_width))
         priors = priorbox.forward()
