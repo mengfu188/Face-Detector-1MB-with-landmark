@@ -1,0 +1,2 @@
+- face.param, face.bin - original face model train by author
+- faceDetector.param, faceDetector.bin - aug for detect mask face
