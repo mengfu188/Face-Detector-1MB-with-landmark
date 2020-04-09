@@ -22,8 +22,8 @@ int main(int argc, char** argv)
     {
         imgPath = argv[1];
     }
-    string param = "../model/face.param";
-    string bin = "../model/face.bin";
+    string param = "../model/faceDetector.param";
+    string bin = "../model/faceDetector.bin";
     const int max_side = 320;
 
     // slim or RFB
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     // retinaface
     // Detector detector(param, bin, true);
     Timer timer;
-    for	(int i = 0; i < 1000; i++){
+    for	(int i = 0; i < 10; i++){
 
 
         cv::Mat img = cv::imread(imgPath.c_str());
