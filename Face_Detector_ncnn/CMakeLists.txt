@@ -6,7 +6,7 @@ add_definitions(-std=c++11)
 add_definitions("-Wall")
 
 # set(OpenCV_DIR "/usr/local/opencv/")
-find_package( OpenCV REQUIRED )
+find_package(OpenCV REQUIRED PATHS /home/cmf/dev/opencv-4.2.0/build/install)
 
 #if(True)
 #    find_package(OpenMP)
@@ -40,8 +40,11 @@ set(SRC
 #add_executable(FaceAlive FaceAlive.cpp FaceDetector.cpp FaceDetector.h)
 #target_link_libraries(FaceAlive ncnn ${OpenCV_LIBS})
 
-add_executable(FaceDetector ${SRC})
-target_link_libraries(FaceDetector ncnn ${OpenCV_LIBS})
+add_executable(ImageFaceDetector ${SRC})
+target_link_libraries(ImageFaceDetector ncnn ${OpenCV_LIBS})
+
+add_executable(VideoFaceDetector FaceDetector.h FaceDetector.cpp ssd_on_video.cpp)
+target_link_libraries(VideoFaceDetector ncnn ${OpenCV_LIBS})
 
 add_executable(test_c test_c.cpp)
 target_link_libraries(test_c ncnn ${OpenCV_LIBS})
@@ -50,5 +53,6 @@ if(OpenMP_CXX_FOUND)
     if(NCNN_CMAKE_VERBOSE)
         message("Building with OpenMP")
     endif()
-    target_link_libraries(FaceDetector PUBLIC OpenMP::OpenMP_CXX)
+    target_link_libraries(ImageFaceDetector PUBLIC OpenMP::OpenMP_CXX)
+    target_link_libraries(VideoFaceDetector PUBLIC OpenMP::OpenMP_CXX)
 endif()
