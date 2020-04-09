@@ -49,6 +49,9 @@ target_link_libraries(VideoFaceDetector ncnn ${OpenCV_LIBS})
 add_executable(test_c test_c.cpp)
 target_link_libraries(test_c ncnn ${OpenCV_LIBS})
 
+add_executable(optical_flow optical_flow.cpp)
+target_link_libraries(optical_flow ${OpenCV_LIBS})
+
 if(OpenMP_CXX_FOUND)
     if(NCNN_CMAKE_VERBOSE)
         message("Building with OpenMP")
