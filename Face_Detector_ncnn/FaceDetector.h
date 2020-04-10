@@ -10,23 +10,21 @@
 #include <stack>
 #include "net.h"
 #include <chrono>
+
 using namespace std::chrono;
 
-class Timer
-{
+class Timer {
 public:
     std::stack<high_resolution_clock::time_point> tictoc_stack;
 
-    void tic()
-    {
+    void tic() {
         high_resolution_clock::time_point t1 = high_resolution_clock::now();
         tictoc_stack.push(t1);
     }
 
-    double toc(std::string msg = "", bool flag = true)
-    {
+    double toc(std::string msg = "", bool flag = true) {
         double diff = duration_cast<milliseconds>(high_resolution_clock::now() - tictoc_stack.top()).count();
-        if(msg.size() > 0){
+        if (msg.size() > 0) {
             if (flag)
                 printf("%s time elapsed: %f ms\n", msg.c_str(), diff);
         }
@@ -34,17 +32,17 @@ public:
         tictoc_stack.pop();
         return diff;
     }
-    void reset()
-    {
+
+    void reset() {
         tictoc_stack = std::stack<high_resolution_clock::time_point>();
     }
 };
 
-struct Point{
+struct Point {
     float _x;
     float _y;
 };
-struct bbox{
+struct bbox {
     float x1;
     float y1;
     float x2;
@@ -53,15 +51,14 @@ struct bbox{
     Point point[5];
 };
 
-struct box{
+struct box {
     float cx;
     float cy;
     float sx;
     float sy;
 };
 
-class Detector
-{
+class Detector {
 
 public:
     Detector();
@@ -74,7 +71,7 @@ public:
 
     void nms(std::vector<bbox> &input_boxes, float NMS_THRESH);
 
-    void Detect(cv::Mat& bgr, std::vector<bbox>& boxes);
+    void Detect(cv::Mat &bgr, std::vector<bbox> &boxes);
 
     void create_anchor(std::vector<box> &anchor, int w, int h);
 
@@ -91,7 +88,8 @@ public:
     float _threshold;
     float _mean_val[3];
     bool _retinaface;
-
+    const int max_side = 320;
     ncnn::Net *Net;
 };
+
 #endif //
