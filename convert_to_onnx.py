@@ -13,16 +13,21 @@ from models.net_slim import Slim
 from models.net_rfb import RFB
 from utils.box_utils import decode, decode_landm
 from utils.timer import Timer
+import time
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
-parser = argparse.ArgumentParser(description='Test')
-parser.add_argument('-m', '--trained_model', default='./weights/RBF_Final.pth',
-                    type=str, help='Trained state_dict file path to open')
-parser.add_argument('--network', default='RFB', help='Backbone network mobile0.25 or slim or RFB')
-parser.add_argument('--long_side', default=320, help='when origin_size is false, long_side is scaled size(320 or 640 for long side)')
-parser.add_argument('--cpu', action="store_true", default=True, help='Use cpu inference')
+def get_args():
+    parser = argparse.ArgumentParser(description='Test')
+    parser.add_argument('-m', '--trained_model', default='./weights/RBF_Final.pth',
+                        type=str, help='Trained state_dict file path to open')
+    parser.add_argument('--network', default='RFB', help='Backbone network mobile0.25 or slim or RFB')
+    parser.add_argument('--long_side', default=320, help='when origin_size is false, long_side is scaled size(320 or 640 for long side)')
+    parser.add_argument('--cpu', action="store_true", default=True, help='Use cpu inference')
 
-args = parser.parse_args()
+    args = parser.parse_args()
+    return args
 
 
 def check_keys(model, pretrained_state_dict):
@@ -62,6 +67,7 @@ def load_model(model, pretrained_path, load_to_cpu):
 
 
 if __name__ == '__main__':
+    args = get_args()
     torch.set_grad_enabled(False)
 
     cfg = None
@@ -86,6 +92,44 @@ if __name__ == '__main__':
     print(net)
     device = torch.device("cpu" if args.cpu else "cuda")
     net = net.to(device)
+
+    data = torch.ones((1, 3, args.long_side, args.long_side), dtype=torch.float32)
+    # hot
+    loop_count = 20
+    for i in range(10):
+        net(data)
+
+    tic = time.time()
+    for i in range(loop_count):
+        net(data)
+    print(f'forward cost {(time.time() - tic) / loop_count} ms')
+
+    total = 0
+    small = 0
+    eps = 1e-8
+    a = []
+    for i in net.parameters():
+        #     print(i.shape, (i < 1e-8).sum(), i.nelement(), (i < 1e-8).sum() * 1.0 / i.nelement(), (i==0).sum())
+        if len(i.shape) == 4 or True:
+            i[i.abs() < eps] = 0
+            # print(i.shape, (i < 1e-8).sum(), i.nelement(), (i < 1e-8).sum() * 1.0 / i.nelement(), (i==0).sum())
+            a.extend(i.flatten().detach().numpy().tolist())
+            total += i.nelement()
+            small += (i.abs() < eps).sum() * 1.0
+    print(small / total)
+    s = pd.Series(a)
+    s = s[s.abs() < 1]
+    s.plot(kind='hist', bins=100, figsize=(15, 5))
+    plt.show()
+    # hot
+    loop_count = 100
+    for i in range(10):
+        net(data)
+
+    tic = time.time()
+    for i in range(loop_count):
+        net(data)
+    print(f'forward cost {(time.time() - tic) / loop_count} ms')
 
     ##################export###############
     output_onnx = 'faceDetector.onnx'
