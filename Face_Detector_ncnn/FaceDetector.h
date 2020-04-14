@@ -42,6 +42,7 @@ struct Point {
     float _x;
     float _y;
 };
+
 struct bbox {
     float x1;
     float y1;
@@ -49,6 +50,16 @@ struct bbox {
     float y2;
     float s;
     Point point[5];
+
+    float *landmark() {
+        static float arr[10] =
+                {point[0]._x, point[0]._y,
+                 point[1]._x, point[1]._y,
+                 point[2]._x, point[2]._y,
+                 point[3]._x, point[3]._y,
+                 point[4]._x, point[4]._y};
+        return arr;
+    }
 };
 
 struct box {
