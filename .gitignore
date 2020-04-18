@@ -7,3 +7,6 @@ __pycache__/
 CMakeFiles/
 widerface_evaluate/box_overlaps.c
 .idea/
+*.pth
+.ipynb_checkpoints
+.idea
