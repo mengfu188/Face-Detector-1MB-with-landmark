@@ -20,8 +20,8 @@ parser = argparse.ArgumentParser(description='Test')
 parser.add_argument('-m', '--trained_model', default='./weights/RBF_Final.pth',
                     type=str, help='Trained state_dict file path to open')
 parser.add_argument('--network', default='RFB', help='Backbone network mobile0.25 or slim or RFB')
-parser.add_argument('--origin_size', default=True, type=str, help='Whether use origin image size to evaluate')
-parser.add_argument('--long_side', default=640, help='when origin_size is false, long_side is scaled size(320 or 640 for long side)')
+parser.add_argument('--origin_size', default=False, type=str, help='Whether use origin image size to evaluate')
+parser.add_argument('--long_side', default=320, help='when origin_size is false, long_side is scaled size(320 or 640 for long side)')
 parser.add_argument('--save_folder', default='./widerface_evaluate/widerface_txt/', type=str, help='Dir to save txt results')
 parser.add_argument('--cpu', action="store_true", default=False, help='Use cpu inference')
 parser.add_argument('--confidence_threshold', default=0.02, type=float, help='confidence_threshold')
@@ -105,6 +105,9 @@ if __name__ == '__main__':
 
         # img_raw = cv2.imread(image_path, cv2.IMREAD_COLOR)
         _, img_raw = cap.read()
+        # img_raw = cv2.resize()
+        # img_raw = np.rot90(img_raw)
+        # img_raw = cv2.resize(img_raw, (240, 320))
         img = np.float32(img_raw)
 
         # testing scale

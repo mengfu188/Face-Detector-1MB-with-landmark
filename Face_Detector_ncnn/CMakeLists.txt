@@ -6,7 +6,7 @@ add_definitions(-std=c++11)
 add_definitions("-Wall")
 
 # set(OpenCV_DIR "/usr/local/opencv/")
-find_package(OpenCV REQUIRED PATHS /home/cmf/dev/opencv-4.2.0/build/install)
+find_package(OpenCV REQUIRED PATHS /home/cmf/dev/opencv-4.2.0/build_extra/install)
 
 #if(True)
 #    find_package(OpenMP)
@@ -21,10 +21,10 @@ find_package(OpenCV REQUIRED PATHS /home/cmf/dev/opencv-4.2.0/build/install)
 #endif()
 
 include_directories(${OpenCV_INCLUDE_DIRS}
-                    ${CMAKE_CURRENT_SOURCE_DIR}/ncnn/include/ncnn)
+        /home/cmf/dev/ncnn/build/install/include/ncnn)
 
 link_directories(${OpenCV_LIBS}
-                 ${CMAKE_CURRENT_SOURCE_DIR}/ncnn/lib)
+        /home/cmf/dev/ncnn/build/install/lib)
 #set(OpenCV_LIBS opencv_core
 #                opencv_highgui
 #                opencv_imgproc
@@ -51,6 +51,21 @@ target_link_libraries(test_c ncnn ${OpenCV_LIBS})
 
 add_executable(optical_flow optical_flow.cpp)
 target_link_libraries(optical_flow ${OpenCV_LIBS})
+
+add_executable(track track.cpp optical_tracker.cpp optical_tracker.h FaceDetector.h FaceDetector.cpp)
+target_link_libraries(track ncnn ${OpenCV_LIBS})
+
+add_executable(recognize face_recognize.cpp FaceDetector.h FaceDetector.cpp)
+target_link_libraries(recognize ncnn ${OpenCV_LIBS})
+
+add_executable(simple_run simple_run.cpp)
+target_link_libraries(simple_run ncnn ${OpenCV_LIBS})
+
+add_executable(face_track face_track.cpp)
+target_link_libraries(face_track ncnn ${OpenCV_LIBS})
+
+add_executable(track_demo track_demo.cpp)
+target_link_libraries(track_demo ncnn ${OpenCV_LIBS})
 
 if(OpenMP_CXX_FOUND)
     if(NCNN_CMAKE_VERBOSE)
