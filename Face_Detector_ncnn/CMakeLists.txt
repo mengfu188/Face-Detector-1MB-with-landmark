@@ -73,6 +73,9 @@ target_link_libraries(track_detect ncnn ${OpenCV_LIBS})
 add_executable(mtcnn_demo mtcnn_demo.cpp mtcnn.cpp mtcnn.h base.cpp base.h)
 target_link_libraries(mtcnn_demo ncnn ${OpenCV_LIBS})
 
+add_executable(ssd_onet ssd_onet.cpp mtcnn.h mtcnn.cpp base.h base.cpp FaceDetector.h FaceDetector.cpp)
+target_link_libraries(ssd_onet ncnn ${OpenCV_LIBS})
+
 if (OpenMP_CXX_FOUND)
     if (NCNN_CMAKE_VERBOSE)
         message("Building with OpenMP")

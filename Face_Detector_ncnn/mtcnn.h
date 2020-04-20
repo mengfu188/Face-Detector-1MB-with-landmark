@@ -16,6 +16,13 @@ public:
     MtcnnDetector();
     ~MtcnnDetector();
     vector<FaceInfo> Detect(ncnn::Mat img);
+
+
+    vector<FaceInfo> Onet_Detect(ncnn::Mat img, vector<FaceInfo> bboxs);
+
+
+    void doNms(vector<FaceInfo> &bboxs, float nms_thresh, string mode);
+    void refine(vector<FaceInfo> &bboxs, int height, int width, bool flag = false);
 private:
     float minsize = 80;
     float threshold[3] = {0.6f, 0.7f, 0.8f};
@@ -28,11 +35,8 @@ private:
     ncnn::Net Lnet;
     vector<FaceInfo> Pnet_Detect(ncnn::Mat img);
     vector<FaceInfo> Rnet_Detect(ncnn::Mat img, vector<FaceInfo> bboxs);
-    vector<FaceInfo> Onet_Detect(ncnn::Mat img, vector<FaceInfo> bboxs);
     void Lnet_Detect(ncnn::Mat img, vector<FaceInfo> &bboxs);
     vector<FaceInfo> generateBbox(ncnn::Mat score, ncnn::Mat loc, float scale, float thresh);
-    void doNms(vector<FaceInfo> &bboxs, float nms_thresh, string mode);
-    void refine(vector<FaceInfo> &bboxs, int height, int width, bool flag = false);
 };
 
 #endif
