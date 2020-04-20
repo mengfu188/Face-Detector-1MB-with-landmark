@@ -32,10 +32,10 @@ link_directories(${OpenCV_LIBS}
 #                )
 
 set(SRC
-    ssd_on_image.cpp
-    FaceDetector.h
-    FaceDetector.cpp
-    )
+        ssd_on_image.cpp
+        FaceDetector.h
+        FaceDetector.cpp
+        )
 
 #add_executable(FaceAlive FaceAlive.cpp FaceDetector.cpp FaceDetector.h)
 #target_link_libraries(FaceAlive ncnn ${OpenCV_LIBS})
@@ -70,10 +70,13 @@ target_link_libraries(track_demo ncnn ${OpenCV_LIBS})
 add_executable(track_detect track_detect.cpp FaceDetector.h FaceDetector.cpp)
 target_link_libraries(track_detect ncnn ${OpenCV_LIBS})
 
-if(OpenMP_CXX_FOUND)
-    if(NCNN_CMAKE_VERBOSE)
+add_executable(mtcnn_demo mtcnn_demo.cpp mtcnn.cpp mtcnn.h base.cpp base.h)
+target_link_libraries(mtcnn_demo ncnn ${OpenCV_LIBS})
+
+if (OpenMP_CXX_FOUND)
+    if (NCNN_CMAKE_VERBOSE)
         message("Building with OpenMP")
-    endif()
+    endif ()
     target_link_libraries(ImageFaceDetector PUBLIC OpenMP::OpenMP_CXX)
     target_link_libraries(VideoFaceDetector PUBLIC OpenMP::OpenMP_CXX)
-endif()
+endif ()
