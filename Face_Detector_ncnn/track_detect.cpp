@@ -20,6 +20,7 @@ int main(int argc, char **argv) {
 
     string param = "../model/faceDetector.param";
     string bin = "../model/faceDetector.bin";
+    string tracker_name = "KCF";
     bool is_track=false;
     bool has_face = false;
     bool is_detect=false;
@@ -33,7 +34,12 @@ int main(int argc, char **argv) {
     cv::Rect2d roi;
     cv::Mat frame;
     // create a tracker object
-    cv::Ptr<cv::Tracker> tracker = cv::TrackerKCF::create();
+    cv::Ptr<cv::Tracker> tracker ;
+    tracker = cv::TrackerKCF::create();
+//    tracker = cv::TrackerBoosting::create();
+//    tracker = cv::TrackerCSRT::create();
+
+//    cv::Ptr<cv::Tracker> tracker = cv::Tracker:;
 
 
 
@@ -48,14 +54,18 @@ int main(int argc, char **argv) {
     for (;;) {
 
         cap >> _img;
+        cv::resize(_img, _img, cv::Size(0, 0), 0.2, 0.2);
+        printf("width %d, height %d\n", _img.cols, _img.rows);
+//        _img.resize(320);
         _img.copyTo(img);
 
         // 重新检测
         boxes.clear();
 
         if(has_face){
-            state = tracker->update(img, roi);
-
+            timer.tic();
+            state = tracker->update(img, roi); // 图片越小越快
+            timer.toc("tracker update");
             if(state){
                 // 跟踪成功
                 track_count += 1;
@@ -64,9 +74,11 @@ int main(int argc, char **argv) {
             }else{
                 // 跟踪失败
                 has_face = false;
+                timer.tic();
                 tracker->clear();
                 tracker.release();
                 tracker = cv::TrackerKCF::create();
+                timer.toc("tracker reset");
             }
 
         }else{
@@ -83,7 +95,9 @@ int main(int argc, char **argv) {
                 has_face = true;
                 bbox box = boxes[0];
                 roi = cv::Rect2i(box.x1, box.y1, box.x2 - box.x1, box.y2 - box.y1);
+                timer.tic();
                 tracker->init(img, roi);
+                timer.toc("tracker init");
 
             }else{
                 // 检测失败
